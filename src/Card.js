@@ -1,14 +1,41 @@
-"use client"; // Ensures Next.js compatibility
+"use client";
 
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client"; // React 18 API
+import moment from "moment";
 
-// ✅ New DateComponent inside Card
-const DateComponent = () => {
+// ✅ Import the DatePicker Component
+const DatePicker = ({ selectedDate, setSelectedDate }) => {
+  const startDate = moment();
+  const daysToShow = 30;
+
   return (
-    <p style={{ fontSize: "14px", color: "#555" }}>
-      📅 Today's Date: {new Date().toLocaleDateString()}
-    </p>
+    <div style={{ padding: "10px", textAlign: "center", background: "#f1f1f1", borderRadius: "10px" }}>
+      <h3>Select a Date:</h3>
+      <div style={{ display: "flex", overflowX: "auto", padding: "5px" }}>
+        {[...Array(daysToShow)].map((_, index) => {
+          const date = startDate.clone().add(index, "day");
+          return (
+            <button
+              key={index}
+              onClick={() => setSelectedDate(date)}
+              style={{
+                padding: "5px",
+                margin: "3px",
+                borderRadius: "5px",
+                background: date.isSame(selectedDate, "day") ? "#007bff" : "#fff",
+                color: date.isSame(selectedDate, "day") ? "#fff" : "#000",
+                border: "1px solid #ccc",
+                cursor: "pointer"
+              }}
+            >
+              {date.format("DD MMM")}
+            </button>
+          );
+        })}
+      </div>
+      <p>📅 Selected Date: {selectedDate.format("D MMM, YYYY")}</p>
+    </div>
   );
 };
 
@@ -16,19 +43,23 @@ const DateComponent = () => {
 const Card = () => {
   console.log("📌 Card component is rendering...");
 
+  // ✅ State to manage selected date
+  const [selectedDate, setSelectedDate] = useState(moment());
+
   return (
     <div style={{
       border: "1px solid #ccc",
       padding: "10px",
       borderRadius: "8px",
-      maxWidth: "300px",
+      maxWidth: "400px",
       background: "#f9f9f9",
       textAlign: "center"
     }}>
       <h2>CDN Card Component</h2>
       <p>✅ Loaded successfully via GitHub Pages!</p>
-      {/* ✅ Include the DateComponent inside Card */}
-      <DateComponent />
+
+      {/* ✅ Include DatePicker Inside Card */}
+      <DatePicker selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
     </div>
   );
 };
