@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDN Test - Card Component</title>
+</head>
+<body>
+    <h2>Testing CDN-based Card Component</h2>
+    
+    <div id="card-root"></div>
+
+    <script src="card.bundle.js" async></script>
+    <script>
+        window.onload = function () {
+            if (window.loadCardComponent) {
+                window.loadCardComponent("card-root");
+            } else {
+                console.error("❌ loadCardComponent function not found.");
+            }
+        };
+    </script>
+</body>
+</html>
