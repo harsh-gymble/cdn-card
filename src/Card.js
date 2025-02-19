@@ -39,12 +39,53 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
   );
 };
 
+// ✅ Dummy Event Data
+const eventData = [
+  {
+    bookingDate: "2025-02-18",
+    bookings: [{ title: "Photography Session", time: "10:00 AM - 12:00 PM", location: "Surat, India", count: 15 }],
+  },
+  {
+    bookingDate: "2025-02-19",
+    bookings: [{ title: "Pre-Wedding Shoot", time: "11:00 AM - 1:00 PM", location: "Mumbai, India", count: 10 }],
+  },
+  {
+    bookingDate: "2025-02-20",
+    bookings: [{ title: "Wedding Reception", time: "3:00 PM - 6:00 PM", location: "Delhi, India", count: 25 }],
+  },
+];
+
+// ✅ Event List Component
+const EventList = ({ selectedDate }) => {
+  const selectedDateStr = selectedDate.format("YYYY-MM-DD");
+
+  const eventsForDate = eventData.find((event) => event.bookingDate === selectedDateStr);
+
+  return (
+    <div style={{ marginTop: "10px", padding: "10px", background: "#fff", borderRadius: "10px" }}>
+      <h3>📅 Events on {selectedDate.format("D MMM, YYYY")}</h3>
+      {eventsForDate ? (
+        eventsForDate.bookings.map((event, index) => (
+          <div key={index} style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
+            <h4>{event.title}</h4>
+            <p>🕒 {event.time}</p>
+            <p>📍 {event.location}</p>
+            <p>👥 {event.count} Attendees</p>
+          </div>
+        ))
+      ) : (
+        <p>No events found for this date.</p>
+      )}
+    </div>
+  );
+};
+
 // ✅ Main Card Component
 const Card = () => {
   console.log("📌 Card component is rendering...");
 
   // ✅ State to manage selected date
-  const [selectedDate, setSelectedDate] = useState(moment());
+  const [selectedDate, setSelectedDate] = useState(moment("2025-02-18", "YYYY-MM-DD"));
 
   return (
     <div style={{
@@ -60,6 +101,9 @@ const Card = () => {
 
       {/* ✅ Include DatePicker Inside Card */}
       <DatePicker selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+
+      {/* ✅ Show Event List */}
+      <EventList selectedDate={selectedDate} />
     </div>
   );
 };
