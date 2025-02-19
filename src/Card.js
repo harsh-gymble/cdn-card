@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client"; // React 18 API
 import moment from "moment";
-import { X } from "lucide-react";
+import { X, Calendar } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function ModalLayout({
   isOpen,
@@ -15,17 +17,11 @@ function ModalLayout({
   dontCloseWhenClickedOut,
   minHeight,
   hideX,
-  btnLoader,
-  isDisabled,
-  isHeaderBtn,
-  isHeaderBtnClick,
-  message,
   bgColor,
   maxHeight,
 }) {
   const [isMainDiv, setIsMainDiv] = useState(false);
   const [childDiv, setChildDiv] = useState(false);
-  const [loader, setLoader] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -58,93 +54,41 @@ function ModalLayout({
 
   return (
     <>
-      <div
-        onClick={(e) => {
-          if (!dontCloseWhenClickedOut) {
-            setChildDiv(false);
-            setTimeout(() => {
-              setIsOpen(false);
-              setIsMainDiv(false);
-            }, 500);
-          }
-        }}
-        className={`fixed h-[100vh] left-0 top-0 bottom-0 right-0 z-[100000] w-full ${
-          isMainDiv ? "flex" : "hidden"
-        } h-full justify-center items-center bg-opacity-[0.6] overflow-hidden bg-black
-          xsm:items-end sm:items-end md:items-end`}
-      >
+      {isOpen && (
         <div
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
+            if (!dontCloseWhenClickedOut) {
+              setChildDiv(false);
+              setTimeout(() => {
+                setIsOpen(false);
+                setIsMainDiv(false);
+              }, 500);
+            }
           }}
-          style={{
-            width: isMobile ? "100%" : modalWidth ? `${modalWidth}` : "30%",
-          }}
-          className={`relative z-[100]  overflow-y-auto ${
-            maxHeight ? maxHeight : "max-h-[90vh]"
-          }  ${modalTitle ? "pb-6" : ""} ${
-            childDiv
-              ? "scale-[1] xsm:translate-y-0 sm:translate-y-0 md:translate-y-0 xsm:scale-100 sm:scale-100 md:scale-100 duration-300"
-              : "scale-0 xsm:translate-y-[1500px] sm:translate-y-[1500px] md:translate-y-[1500px] xsm:scale-100 sm:scale-100 md:scale-100 xsm:duration-1000 sm:duration-1000 md:duration-1000 duration-300"
-          } ${tab ? "min-h-[80vh]" : ""} transform transition-all ease-out ${
-            bgColor ? bgColor : "bg-[#f7f7f7]"
-          }  rounded-lg shadow
-            xsm:max-h-[85vh] sm:max-h-[85vh] md:max-h-[85vh]
-            xsm:h-auto sm:h-auto md:h-auto
-            xsm:rounded-t-lg sm:rounded-t-lg md:rounded-t-lg
-            xsm:rounded-b-none sm:rounded-b-none md:roundedt-b-none
-            xsm:w-full sm:w-full md:w-full`}
+          className="fixed inset-0 z-[100000] flex items-center justify-center bg-black bg-opacity-60"
         >
           <div
-            className={`cursor-pointer px-5 ${
-              modalTitle ? "py-3 border-b-[1px]" : ""
-            } items-center border-gray-20 flex justify-center`}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white p-6 rounded-lg w-[400px]"
           >
-            <h3 className="mx-auto flex justify-center items-center w-full font-heading text-[24px] xxl:text-[22px] font-semibold">
-              {isMobile ? (
-                <>
-                  {modalTitle?.substring(0, 20)}
-                  {modalTitle?.length > 20 && "..."}
-                </>
-              ) : (
-                modalTitle
-              )}
-            </h3>{" "}
-            {!hideX && (
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">{modalTitle}</h3>
               <X
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setChildDiv(false);
-                  setTimeout(() => {
-                    setIsOpen(false);
-                    setIsMainDiv(false);
-                  }, 500);
-                }}
-                className={`text-[20px] ml-auto ${
-                  modalTitle
-                    ? ""
-                    : `absolute ${
-                        bgColor == "bg-white" ? "top-[20px]" : "top-[12px]"
-                      } right-[12px]`
-                }`}
+                onClick={() => setIsOpen(false)}
+                className="cursor-pointer text-gray-500 hover:text-gray-800"
               />
-            )}
-          </div>
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
+            </div>
             {children}
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
 
-// ✅ DatePicker Component (No Changes)
-const DatePicker = ({ selectedDate, setSelectedDate }) => {
+// ✅ Updated DatePicker Component
+const DatePickerComponent = ({ selectedDate, setSelectedDate }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const startDate = moment();
   const daysToShow = 30;
 
@@ -159,6 +103,22 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
     >
       <h3>Select a Date:</h3>
       <div style={{ display: "flex", overflowX: "auto", padding: "5px" }}>
+        {/* 📅 Fixed Date Picker Button */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          style={{
+            padding: "5px",
+            margin: "3px",
+            borderRadius: "5px",
+            background: "#007bff",
+            color: "#fff",
+            border: "1px solid #ccc",
+            cursor: "pointer",
+          }}
+        >
+          <Calendar size={16} /> Select Date
+        </button>
+
         {[...Array(daysToShow)].map((_, index) => {
           const date = startDate.clone().add(index, "day");
           return (
@@ -182,6 +142,19 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
           );
         })}
       </div>
+
+      {/* 📅 Date Picker Modal */}
+      <ModalLayout isOpen={isModalOpen} setIsOpen={setIsModalOpen} modalTitle="Select a Date">
+        <DatePicker
+          selected={selectedDate.toDate()}
+          onChange={(date) => {
+            setSelectedDate(moment(date));
+            setIsModalOpen(false);
+          }}
+          inline
+        />
+      </ModalLayout>
+
       <p>📅 Selected Date: {selectedDate.format("D MMM, YYYY")}</p>
     </div>
   );
@@ -190,10 +163,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
 // ✅ Event List Component (No Changes)
 const EventList = ({ selectedDate }) => {
   const selectedDateStr = selectedDate.format("YYYY-MM-DD");
-
-  const eventsForDate = eventData.find(
-    (event) => event.bookingDate === selectedDateStr
-  );
+  const eventsForDate = eventData.find((event) => event.bookingDate === selectedDateStr);
 
   return (
     <div
@@ -207,10 +177,7 @@ const EventList = ({ selectedDate }) => {
       <h3>📅 Events on {selectedDate.format("D MMM, YYYY")}</h3>
       {eventsForDate ? (
         eventsForDate.bookings.map((event, index) => (
-          <div
-            key={index}
-            style={{ padding: "10px", borderBottom: "1px solid #ccc" }}
-          >
+          <div key={index} style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
             <h4>{event.title}</h4>
             <p>🕒 {event.time}</p>
             <p>📍 {event.location}</p>
@@ -226,52 +193,15 @@ const EventList = ({ selectedDate }) => {
 
 // ✅ Dummy Event Data (No Changes)
 const eventData = [
-  {
-    bookingDate: "2025-02-18",
-    bookings: [
-      {
-        title: "Photography Session",
-        time: "10:00 AM - 12:00 PM",
-        location: "Surat, India",
-        count: 15,
-      },
-    ],
-  },
-  {
-    bookingDate: "2025-02-19",
-    bookings: [
-      {
-        title: "Pre-Wedding Shoot",
-        time: "11:00 AM - 1:00 PM",
-        location: "Mumbai, India",
-        count: 10,
-      },
-    ],
-  },
-  {
-    bookingDate: "2025-02-20",
-    bookings: [
-      {
-        title: "Wedding Reception",
-        time: "3:00 PM - 6:00 PM",
-        location: "Delhi, India",
-        count: 25,
-      },
-    ],
-  },
+  { bookingDate: "2025-02-18", bookings: [{ title: "Photography Session", time: "10:00 AM - 12:00 PM", location: "Surat, India", count: 15 }] },
+  { bookingDate: "2025-02-19", bookings: [{ title: "Pre-Wedding Shoot", time: "11:00 AM - 1:00 PM", location: "Mumbai, India", count: 10 }] },
+  { bookingDate: "2025-02-20", bookings: [{ title: "Wedding Reception", time: "3:00 PM - 6:00 PM", location: "Delhi, India", count: 25 }] },
 ];
 
 // ✅ Main Card Component
 const Card = () => {
   console.log("📌 Card component is rendering...");
-
-  // ✅ State to manage selected date (No Changes)
-  const [selectedDate, setSelectedDate] = useState(
-    moment("2025-02-18", "YYYY-MM-DD")
-  );
-
-  // ✅ State to control modal visibility
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(moment("2025-02-18", "YYYY-MM-DD"));
 
   return (
     <div
@@ -287,68 +217,24 @@ const Card = () => {
       <h2>CDN Card Component</h2>
       <p>✅ Loaded successfully via GitHub Pages!</p>
 
-      {/* ✅ Include DatePicker Inside Card */}
-      <DatePicker
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-      />
+      {/* ✅ Updated DatePicker Component */}
+      <DatePickerComponent selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 
       {/* ✅ Show Event List */}
       <EventList selectedDate={selectedDate} />
-
-      {/* ✅ Button to Open Modal */}
-      <button
-        style={{
-          marginTop: "10px",
-          padding: "10px",
-          borderRadius: "5px",
-          border: "none",
-          background: "#007bff",
-          color: "#fff",
-          cursor: "pointer",
-        }}
-        onClick={() => setIsModalOpen(true)}
-      >
-        Open Modal
-      </button>
-
-      {/* ✅ Modal Layout */}
-      {isModalOpen && (
-        <ModalLayout
-          isOpen={isModalOpen}
-          minHeight
-          setIsOpen={setIsModalOpen}
-          modalWidth={"70%"}
-          tab={false}
-          dontCloseWhenClickedOut={false}
-          bgColor={"bg-white"}
-        >
-          <div className="my-5">
-            <h3>📅 This is the Calendar Modal</h3>
-            <p>Click outside or press "X" to close.</p>
-          </div>
-        </ModalLayout>
-      )}
     </div>
   );
 };
 
-// ✅ Function to mount the component dynamically (No Changes)
+// ✅ Function to mount the component dynamically
 window.loadCardComponent = (elementId) => {
   console.log("⚡ loadCardComponent function is called.");
-
   const element = document.getElementById(elementId);
   if (!element) {
     console.error(`❌ Error: Element with ID '${elementId}' not found.`);
     return;
   }
-
   console.log(`⚡ Mounting Card Component to #${elementId}`);
-
-  try {
-    const root = ReactDOM.createRoot(element);
-    root.render(<Card />);
-  } catch (error) {
-    console.error("❌ Error rendering Card component:", error);
-  }
+  const root = ReactDOM.createRoot(element);
+  root.render(<Card />);
 };
