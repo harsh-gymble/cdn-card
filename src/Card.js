@@ -144,7 +144,11 @@ const DatePickerComponent = ({ selectedDate, setSelectedDate }) => {
       </div>
 
       {/* 📅 Date Picker Modal */}
-      <ModalLayout isOpen={isModalOpen} setIsOpen={setIsModalOpen} modalTitle="Select a Date">
+      <ModalLayout
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        modalTitle="Select a Date"
+      >
         <DatePicker
           selected={selectedDate.toDate()}
           onChange={(date) => {
@@ -163,7 +167,9 @@ const DatePickerComponent = ({ selectedDate, setSelectedDate }) => {
 // ✅ Event List Component (No Changes)
 const EventList = ({ selectedDate }) => {
   const selectedDateStr = selectedDate.format("YYYY-MM-DD");
-  const eventsForDate = eventData.find((event) => event.bookingDate === selectedDateStr);
+  const eventsForDate = eventData.find(
+    (event) => event.bookingDate === selectedDateStr
+  );
 
   return (
     <div
@@ -177,7 +183,10 @@ const EventList = ({ selectedDate }) => {
       <h3>📅 Events on {selectedDate.format("D MMM, YYYY")}</h3>
       {eventsForDate ? (
         eventsForDate.bookings.map((event, index) => (
-          <div key={index} style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
+          <div
+            key={index}
+            style={{ padding: "10px", borderBottom: "1px solid #ccc" }}
+          >
             <h4>{event.title}</h4>
             <p>🕒 {event.time}</p>
             <p>📍 {event.location}</p>
@@ -193,15 +202,87 @@ const EventList = ({ selectedDate }) => {
 
 // ✅ Dummy Event Data (No Changes)
 const eventData = [
-  { bookingDate: "2025-02-18", bookings: [{ title: "Photography Session", time: "10:00 AM - 12:00 PM", location: "Surat, India", count: 15 }] },
-  { bookingDate: "2025-02-19", bookings: [{ title: "Pre-Wedding Shoot", time: "11:00 AM - 1:00 PM", location: "Mumbai, India", count: 10 }] },
-  { bookingDate: "2025-02-20", bookings: [{ title: "Wedding Reception", time: "3:00 PM - 6:00 PM", location: "Delhi, India", count: 25 }] },
+  {
+    bookingDate: "2025-02-18",
+    bookings: [
+      {
+        title: "Photography Session",
+        time: "10:00 AM - 12:00 PM",
+        location: "Surat, India",
+        count: 15,
+      },
+    ],
+  },
+  {
+    bookingDate: "2025-02-19",
+    bookings: [
+      {
+        title: "Pre-Wedding Shoot",
+        time: "11:00 AM - 1:00 PM",
+        location: "Mumbai, India",
+        count: 10,
+      },
+    ],
+  },
+  {
+    bookingDate: "2025-02-20",
+    bookings: [
+      {
+        title: "Wedding Reception",
+        time: "3:00 PM - 6:00 PM",
+        location: "Delhi, India",
+        count: 25,
+      },
+    ],
+  },
 ];
 
 // ✅ Main Card Component
 const Card = () => {
   console.log("📌 Card component is rendering...");
-  const [selectedDate, setSelectedDate] = useState(moment("2025-02-18", "YYYY-MM-DD"));
+  const [selectedDate, setSelectedDate] = useState(
+    moment("2025-02-25", "YYYY-MM-DD")
+  );
+  const [businessData, setBusinessData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("https://test-api.gymble.us/website/business/profile/details", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            bisLink: "all-star-basketball-academy",
+            locationId: null,
+            page: 1,
+            limit: 5,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const data = await response.json();
+        console.log(data);
+        setBusinessData(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div
@@ -218,7 +299,10 @@ const Card = () => {
       <p>✅ Loaded successfully via GitHub Pages!</p>
 
       {/* ✅ Updated DatePicker Component */}
-      <DatePickerComponent selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      <DatePickerComponent
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
 
       {/* ✅ Show Event List */}
       <EventList selectedDate={selectedDate} />
